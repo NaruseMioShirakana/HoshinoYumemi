@@ -469,6 +469,7 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
         if(keyword == "rand"){
             urlStr = "https://api.lolicon.app/setu/v2?size=${size}&proxy=${proxy}&num=${num}"
         }
+        urlStr.replace("r18=1","r18=0").replace("r18=2","r18=0")
         var req = OkHttpClient()
         val data = req.newCall(Request.Builder().url(urlStr).build()).execute()
         val resq : LoliconJson = Json.decodeFromString(data.body!!.string())
