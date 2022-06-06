@@ -469,7 +469,11 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
         if(keyword == "rand"){
             urlStr = "https://api.lolicon.app/setu/v2?size=${size}&proxy=${proxy}&num=${num}"
         }
-        urlStr.replace("r18=1","r18=0").replace("r18=2","r18=0")
+        urlStr.replace("r18=1","").replace("r18=2","")
+        if(urlStr.contains("r18")||urlStr.contains("R18")){
+            contact.sendMessage("不可以瑟瑟")
+            return mutableListOf<ForwardMessage.Node>()
+        }
         var req = OkHttpClient()
         val data = req.newCall(Request.Builder().url(urlStr).build()).execute()
         val resq : LoliconJson = Json.decodeFromString(data.body!!.string())
