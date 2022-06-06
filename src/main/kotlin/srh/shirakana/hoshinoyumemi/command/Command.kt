@@ -258,6 +258,7 @@ object HoshinoYumemiKouKannCommand : CompositeCommand(
         HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.add(Target)
         HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[Target] = -800.0
     }
+    //
     @SubCommand
     @Description("移出黑名单")
     suspend fun CommandSender.blrem(Target : Long) {
