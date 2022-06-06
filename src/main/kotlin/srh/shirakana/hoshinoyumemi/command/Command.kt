@@ -56,7 +56,7 @@ data class LoliconJson(val error: String, val data: List<Data>) {
 }
 
 @Serializable
-data class SaucenaoJson(val header : Header,val result : List<Results>){
+data class SaucenaoJson(val header : Header,val results : List<Results>){
     @Serializable
     data class Header(
         val user_id: String,
@@ -100,7 +100,6 @@ data class SaucenaoJson(val header : Header,val result : List<Results>){
         data class DATA(
             val ext_urls:List<String>? = null,
             val path: String? = null,
-            val creator:List<String>? = null,
             val creator_name:String? = null,
             val author_name:String? = null,
             val title:String? = null,
@@ -529,13 +528,14 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
                     encodeDefaults =true
                     coerceInputValues=true
                 }
-                val resq: SaucenaoJson = jsonTmp.decodeFromString(data.body!!.string().replace("\"results\":[{","\"result\":[{").replace("\\/","/"));
+                val resq: SaucenaoJson = jsonTmp.decodeFromString(data.body!!.string());
                 //.decodeFromString(test.replace("\"results\":[{","\"result\":[{"))
-                if(resq.result.isNotEmpty()){
+                if(resq.results.isNotEmpty()){
                     val msgChainHandle = mutableListOf<ForwardMessage.Node>()
-                    for((i, element) in resq.result.withIndex()){
+                    for((i, element) in resq.results.withIndex()){
                         msgChainHandle.add(ForwardMessage.Node(user!!.id, i,"搜索者", buildMessageChain {
-                            +PlainText("相似度：${element.header.similarity}\n${element.data.toJsonString()}")
+                            +PlainText("相似度："+element.header.similarity+"%\n")
+                            +PlainText(element.data.toJsonString().replace("\\/","/"))
                         }))
                     }
                     val msg = RawForwardMessage(msgChainHandle).render(
