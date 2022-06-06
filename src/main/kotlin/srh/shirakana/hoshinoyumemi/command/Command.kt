@@ -535,7 +535,7 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
                     val msgChainHandle = mutableListOf<ForwardMessage.Node>()
                     for((i, element) in resq.result.withIndex()){
                         msgChainHandle.add(ForwardMessage.Node(user!!.id, i,"搜索者", buildMessageChain {
-                            +PlainText(element.data.toJsonString())
+                            +PlainText("相似度：${element.header.similarity}\n${element.data.toJsonString()}")
                         }))
                     }
                     val msg = RawForwardMessage(msgChainHandle).render(
