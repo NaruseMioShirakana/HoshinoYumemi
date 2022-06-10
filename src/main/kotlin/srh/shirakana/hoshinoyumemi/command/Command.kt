@@ -1,5 +1,8 @@
 package srh.shirakana.hoshinoyumemi.command
 
+import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.JSONObject
+import com.alibaba.fastjson.serializer.SerializerFeature
 import com.tencentcloudapi.common.Credential
 import com.tencentcloudapi.common.exception.TencentCloudSDKException
 import com.tencentcloudapi.common.profile.ClientProfile
@@ -22,8 +25,11 @@ import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import srh.shirakana.hoshinoyumemi.BotJobs
 import srh.shirakana.hoshinoyumemi.HoshiniYumemi
 import srh.shirakana.hoshinoyumemi.file.*
+import srh.shirakana.hoshinoyumemi.userJobs
+import srh.shirakana.hoshinoyumemi.userS
 import java.awt.Color
 import java.awt.Font
 import java.awt.image.BufferedImage
@@ -32,124 +38,6 @@ import java.math.RoundingMode
 import java.net.URL
 import java.util.*
 import javax.imageio.ImageIO
-
-@Serializable
-data class LoliconJson(val error: String, val data: List<Data>) {
-    @Serializable
-    data class Data(
-        val pid: Int,
-        val p: Int,
-        val uid: Int,
-        val title: String,
-        val author: String,
-        val r18: Boolean,
-        val width: Int,
-        val height: Int,
-        val tags: List<String>,
-        val ext: String,
-        val uploadDate: Long,
-        val urls: Urls
-    ) {
-        @Serializable
-        data class Urls(val regular: String)
-    }
-}
-
-@Serializable
-data class SaucenaoJson(val header : Header,val results : List<Results>){
-    @Serializable
-    data class Header(
-        val user_id: String,
-        val account_type: String,
-        val short_limit: String,
-        val long_limit: String,
-        val long_remaining: Int,
-        val short_remaining: Int,
-        val status: Int,
-        val results_requested: Int,
-        val index : Map<Int, INDEX>,
-        val search_depth: String,
-        val minimum_similarity: Double,
-        val query_image_display: String,
-        val query_image: String,
-        val results_returned: Int
-    ){
-        @Serializable
-        data class INDEX(
-            val status :Int,
-            val parent_id :Int,
-            val id :Int,
-            val results :Int
-        )
-    }
-    @Serializable
-    data class Results(
-        val header: HEADER,
-        val data: DATA
-    ){
-        @Serializable
-        data class HEADER(
-            val similarity :String,
-            val thumbnail :String,
-            val index_id :Int,
-            val index_name :String,
-            val dupes :Int,
-            val hidden :Int
-        )
-        @Serializable
-        data class DATA(
-            val ext_urls:List<String>? = null,
-            val path: String? = null,
-            val creator_name:String? = null,
-            val author_name:String? = null,
-            val title:String? = null,
-            val da_id:String? = null,
-            val source:String? = null,
-            val pixiv_id:Long? = null,
-            val member_name:String? = null,
-            val member_id:Long? = null,
-            val anidb_aid:Long? = null,
-            val mal_id:Long? = null,
-            val anilist_id:Long? = null,
-            val part:String? = null,
-            val year:String? = null,
-            val est_time:String? = null,
-            val fa_id:Long? = null,
-            val created_at:String? = null,
-            val tweet_id:String? = null,
-            val twitter_user_id:String? = null,
-            val twitter_user_handle:String? = null,
-            val eng_name:String? = null,
-            val jp_name:String? = null,
-            val bcy_type:String? = null,
-            val bcy_id:Long? = null,
-            val member_link_id:Long? = null,
-            val fn_type:String? = null,
-            val pawoo_id:Long? = null,
-            val pawoo_user_acct:String? = null,
-            val pawoo_user_username:String? = null,
-            val type:String? = null,
-            val mu_id:Long? = null,
-            val pawoo_user_display_name:String? = null,
-            val published:String? = null,
-            val service:String? = null,
-            val service_name:String? = null,
-            val id:String? = null,
-            val user_id:String? = null,
-            val user_name:String? = null,
-            val md_id:String? = null,
-            val artist:String? = null,
-            val author:String? = null,
-            val author_url:String? = null
-        ){
-            @OptIn(ExperimentalSerializationApi::class)
-            public fun toJsonString():String{
-                return Json.encodeToString(this).replace("{","").replace("}","")
-                    .replace(",\"","\n\"")
-            }
-        }
-    }
-}
 
 object HoshinoYumemiKouKannCommand : CompositeCommand(
     HoshiniYumemi, "KouKann",
@@ -187,21 +75,21 @@ object HoshinoYumemiKouKannCommand : CompositeCommand(
         val fixedOffsetY = graphics.fontMetrics.ascent - (graphics.fontMetrics.height / 2 - 18 / 2)
         graphics.drawString(kouKanLevel.toString(),536,438+fixedOffsetY)
         if(kouKanLevel==10L){
-            graphics.drawString("[誓约/爱]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[誓约/爱]",438,470+fixedOffsetY)
         }else if(kouKanLevel==9L){
-            graphics.drawString("[至交]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[至交]",438,470+fixedOffsetY)
         }else if(kouKanLevel>7){
-            graphics.drawString("[朋友]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[朋友]",438,470+fixedOffsetY)
         }else if(kouKanLevel>5){
-            graphics.drawString("[熟悉]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[熟悉]",438,470+fixedOffsetY)
         }else if(kouKanLevel>3){
-            graphics.drawString("[一般]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[一般]",438,470+fixedOffsetY)
         }else if(kouKanLevel>1){
-            graphics.drawString("[比较冷漠]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[比较冷漠]",438,470+fixedOffsetY)
         }else if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[target.id]!! >-1){
-            graphics.drawString("[冷漠]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[冷漠]",438,470+fixedOffsetY)
         }else{
-            graphics.drawString("[讨厌]",572,470+fixedOffsetY)
+            graphics.drawString("${HoshinoYumemiConfig.HoshinoYumemiNoName}对你的态度：[讨厌]",438,470+fixedOffsetY)
         }
         graphics.drawString((100-kouKanValue).toString(),552,500+fixedOffsetY)
         graphics.font = Font("楷体", Font.PLAIN ,24)
@@ -355,6 +243,9 @@ object HoshinoYumemiReplyListCommand : CompositeCommand(
             return
         }
         HoshinoYumemiReplyList.HoshinoYumemiNoReplyList[input]?.remove(mapOf(KouKannLevel to output))
+        if(HoshinoYumemiReplyList.HoshinoYumemiNoReplyList[input]?.isEmpty() == true){
+            HoshinoYumemiReplyList.HoshinoYumemiNoReplyList.remove(input)
+        }
         sendMessage("删除成功")
     }
     @SubCommand
@@ -407,14 +298,41 @@ object HoshinoYumemiTencentCloudAPI : CompositeCommand(
             clientProfile.httpProfile = httpProfile
             val client = TmtClient(cred, "ap-beijing", clientProfile)
             val req = TextTranslateRequest()
-            req.sourceText = input
+            req.sourceText = input.replace("_"," ")
             req.source = "auto"
             req.target = lang
             req.projectId = 0L
             val resp = client.TextTranslate(req)
             sendMessage("翻译结果：" + resp.targetText)
         }catch (e: TencentCloudSDKException) {
-            sendMessage(e.toString())
+            if(e.toString().contains("不支持的语种")){
+                try{
+                    val cred = Credential(
+                        HoshinoYumemiTencentCloudApiConfig.HoshinoYumemiSecretId,
+                        HoshinoYumemiTencentCloudApiConfig.HoshinoYumemiSecretKey
+                    )
+                    val httpProfile = HttpProfile()
+                    httpProfile.endpoint = "tmt.tencentcloudapi.com"
+                    val clientProfile = ClientProfile()
+                    clientProfile.httpProfile = httpProfile
+                    val client = TmtClient(cred, "ap-beijing", clientProfile)
+                    val requestTmp = TextTranslateRequest()
+                    requestTmp.sourceText = input.replace("_"," ")
+                    requestTmp.source = "auto"
+                    requestTmp.target = "zh"
+                    requestTmp.projectId = 0L
+                    val respTmp = client.TextTranslate(requestTmp)
+                    requestTmp.sourceText = respTmp.targetText
+                    requestTmp.source = "zh"
+                    requestTmp.target = lang
+                    val respOut = client.TextTranslate(requestTmp)
+                    sendMessage("翻译结果：" + respOut.targetText)
+                }catch (f: TencentCloudSDKException) {
+                    sendMessage(f.toString())
+                }
+            }else{
+                sendMessage(e.toString())
+            }
         }
     }
     /*@SubCommand
@@ -632,6 +550,86 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
     }
 }
 
+object HoshinoYumemiWorkCommand : CompositeCommand(
+    HoshiniYumemi, "WorkAdm",
+    description = "工作管理员指令",
+){
+
+    @OptIn(ExperimentalSerializationApi::class)
+    @SubCommand
+    @Description("添加工作")
+    suspend fun CommandSender.addWork(requiredSpecialize : String,reward : Double) {
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[requiredSpecialize]==null){
+            sendMessage("不存在当前专业")
+            return
+        }
+        if(userJobs.job.find{it.requiredSpecialized==requiredSpecialize}!=null){
+            userJobs.job.find{it.requiredSpecialized==requiredSpecialize}!!.reward=reward
+            sendMessage("已存在该工作，修改了reward")
+        }
+        if(userJobs.job.add(BotJobs.JobsBot(requiredSpecialize, reward))){
+            sendMessage("添加成功")
+            val jobsDataFile = File("data/srh.shirakana.hoshinoyumemi.plugin/Jobs.json")
+            val userJobsJson = Json.encodeToString(userJobs)
+            val jsonObjectUserJobs: JSONObject = JSONObject.parseObject(userJobsJson)
+            val formatStrUserJobs: String = JSON.toJSONString(
+                jsonObjectUserJobs, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
+                SerializerFeature.WriteDateUseDateFormat
+            )
+            jobsDataFile.writeText(formatStrUserJobs)
+        }else{
+            sendMessage("添加失败")
+        }
+    }
+    @OptIn(ExperimentalSerializationApi::class)
+    @SubCommand
+    @Description("删除工作")
+    suspend fun CommandSender.delWork(requiredSpecialize : String) {
+        if(userJobs.job.remove(userJobs.job.find{it.requiredSpecialized == requiredSpecialize})){
+            sendMessage("删除成功")
+            val jobsDataFile = File("data/srh.shirakana.hoshinoyumemi.plugin/Jobs.json")
+            val userJobsJson = Json.encodeToString(userJobs)
+            val jsonObjectUserJobs: JSONObject = JSONObject.parseObject(userJobsJson)
+            val formatStrUserJobs: String = JSON.toJSONString(
+                jsonObjectUserJobs, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
+                SerializerFeature.WriteDateUseDateFormat
+            )
+            jobsDataFile.writeText(formatStrUserJobs)
+        }else{
+            sendMessage("删除失败")
+        }
+    }
+    @OptIn(ExperimentalSerializationApi::class)
+    @SubCommand
+    @Description("添加考试题目")
+    suspend fun CommandSender.addTest(Specialize : String,Question : String,Answer : String) {
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]==null){
+            HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]= mutableSetOf()
+        }
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]!!.add(mapOf(Question to Answer))){
+            sendMessage("添加成功")
+        }else{
+            sendMessage("添加失败")
+        }
+    }
+    @OptIn(ExperimentalSerializationApi::class)
+    @SubCommand
+    @Description("删除考试题目")
+    suspend fun CommandSender.delTest(Specialize : String,Question : String) {
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]==null){
+            sendMessage("不存在此专业")
+            return
+        }
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]?.
+            remove(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]?.find{it.keys.elementAt(0)==Question})
+                ==true){
+            sendMessage("删除成功")
+        }else{
+            sendMessage("删除失败")
+        }
+    }
+}
+
 object HoshinoYumemiUserCommand : CompositeCommand(
     HoshiniYumemi, "usrcmd",
     description = "用户指令",
@@ -716,5 +714,90 @@ object HoshinoYumemiUserCommand : CompositeCommand(
         }else{
             sendMessage("不存在该ID")
         }
+    }
+    @SubCommand
+    @Description("参加指定专业的考试")
+    suspend fun CommandSender.jointest(name : String) {
+        if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
+            subject!!.sendMessage("哼，不理你了")
+            return
+        }
+        if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
+            return
+        }
+        if(user==null)return;
+        if(HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.contains(user!!.id)){
+            return
+        }
+        if(!HoshinoYumemiCourse.HoshinoYumemiNoCourses.keys.contains(name)){
+            sendMessage("没有指定的专业")
+            return
+        }
+        if(userS[user!!.id]?.specialized!="null"&&userS[user!!.id]?.specialized!=name){
+            sendMessage("你只能参加你所在专业的考试")
+            return
+        }
+        if(userS[user!!.id]?.specialized=="null"){
+            userS[user!!.id]?.specialized=name
+        }
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[name]!!.isEmpty())return
+        val testQuestIndex = HoshinoYumemiCourse.HoshinoYumemiNoCourses[userS[user!!.id]!!.specialized]!!.size-1
+        userS[user!!.id]?.testQuest=
+            HoshinoYumemiCourse.HoshinoYumemiNoCourses[userS[user!!.id]!!.specialized]!!.elementAt((0..testQuestIndex).random()).keys.elementAt(0)
+        userS[user!!.id]?.testState=true
+        sendMessage(buildMessageChain {
+            +At(user!!)
+            +PlainText("题目：${ userS[user!!.id]?.testQuest!! }\n请回答（需要ATBOT并输入答案）")
+        })
+    }
+    @SubCommand
+    @Description("列出目前存在的专业")
+    suspend fun CommandSender.LS() {
+        if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
+            subject!!.sendMessage("哼，不理你了")
+            return
+        }
+        if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
+            return
+        }
+        if(user==null)return;
+        if(HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.contains(user!!.id)){
+            return
+        }
+        sendMessage("目前有的专业：${HoshinoYumemiCourse.HoshinoYumemiNoCourses.keys.toString()}")
+    }
+    @SubCommand
+    @Description("显示自己的专业及学位")
+    suspend fun CommandSender.mysp() {
+        if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
+            subject!!.sendMessage("哼，不理你了")
+            return
+        }
+        if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
+            return
+        }
+        if(user==null)return;
+        if(HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.contains(user!!.id)){
+            return
+        }
+        sendMessage("目前有的专业：${userS[user!!.id]!!.specialized}\n目前的学位：${userS[user!!.id]!!.degree}")
+    }
+    @SubCommand
+    @Description("放弃当前学位")
+    suspend fun CommandSender.giveupmysp() {
+        if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
+            subject!!.sendMessage("哼，不理你了")
+            return
+        }
+        if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
+            return
+        }
+        if(user==null)return;
+        if(HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.contains(user!!.id)){
+            return
+        }
+        userS[user!!.id]!!.specialized="null"
+        userS[user!!.id]!!.degree=0
+        sendMessage("放弃成功")
     }
 }

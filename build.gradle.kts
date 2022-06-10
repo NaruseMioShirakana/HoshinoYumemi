@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "srh.shirakana.hoshinoyumemi"
-version = "0.0.1"
+version = "0.0.2"
 
 repositories {
     maven("https://maven.aliyun.com/repository/public")
@@ -15,4 +15,5 @@ repositories {
 }
 dependencies {
     implementation("com.tencentcloudapi:tencentcloud-sdk-java:4.0.11")
+    implementation("com.alibaba:fastjson:2.0.3")
 }

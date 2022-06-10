@@ -15,7 +15,7 @@ object HoshiniYumemi : KotlinPlugin(
     JvmPluginDescription(
         id = "srh.shirakana.hoshinoyumemi.plugin",
         name = "功能性机器人",
-        version = "0.0.1",
+        version = "0.0.2",
     ) {
         author("藤原白叶")
     }
@@ -32,6 +32,7 @@ object HoshiniYumemi : KotlinPlugin(
         HoshinoYumemiSaucenaoApiConfig.reload()
         HoshinoYumemiShop.reload()
         HoshinoYumemiConfig.reload()
+        HoshinoYumemiCourse.reload()
 
         ShirakanaEventListener.registerTo(globalEventChannel())
 
@@ -41,6 +42,7 @@ object HoshiniYumemi : KotlinPlugin(
         HoshinoYumemiReplyListCommand.register()
         HoshinoYumemiTencentCloudAPI.register()
         HoshinoYumemiUserCommand.register()
+        HoshinoYumemiWorkCommand.register()
 
         logger.info { "Plugin 功能性机器人 loaded" }
     }
@@ -52,5 +54,6 @@ object HoshiniYumemi : KotlinPlugin(
         HoshinoYumemiTencentCloudAPI.unregister()
         HoshinoYumemiUserCommand.unregister()
         HoshinoYumemiSeTuCommand.unregister()
+        HoshinoYumemiWorkCommand.unregister()
     }
 }

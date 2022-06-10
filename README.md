@@ -1,4 +1,4 @@
-# HoshinoYumemi
+# HoshiniYumemi
 一个基于Mirai的功能性机器人
 
 ----
@@ -16,7 +16,7 @@
 - Lolicon搜图 （需要好感度等级不低于4级，金币100*获取数量方可使用，好感度等级不低于7级则免金币使用）
 - 黑名单 （将好感度设置为-800并将一切增加好感度的行为变为减少好感度）
 - 礼物商店 （给Bot送礼物）
-- （TODO）各种其他娱乐型BOT的功能，如小游戏，打工等
+- （TODO）各种其他娱乐型BOT的功能，如小游戏等
 ----
 ### 功能详细介绍：
 #### 一、好感度系统：
@@ -231,3 +231,44 @@ Shop:
 - 黑名单：/KouKann <bladd/blrem> Member（将指定群员添加/移除出黑名单>
 - @机器人 睡吧（关闭插件功能）
 - @机器人 起床吧（开启插件功能）
+----
+#### 八、打工和学位
+
+- 介绍：
+
+
+    打工功能，不过与其他娱乐机器人不同，想要打工，必须取得相应专业的学位
+    而学位可以通过考试获得，考试的题目需机器人的管理者自行建库。
+    指令：
+    /WorkAdm addTest <Specialize> <Question> <Answer>
+    #为Specialize专业添加Question问题，答案为Answer（专业不存在则创建）
+    /WorkAdm addWork <requiredSpecialize> <reward>
+    #添加requiredSpecialize专业对应的工作，基础工资为reward（需要存在
+    专业“requiredSpecialize”（上一个指令创建）
+    /WorkAdm delTest <Specialize> <Question>
+    /WorkAdm delWork <requiredSpecialize>
+    #下面两个为删除相应内容
+    /usrcmd LS 
+    #查看所有存在的专业
+    /usrcmd mysp
+    #查看自己的专业及学位
+    /usrcmd giveupmysp
+    #放弃自己的学位
+    /usrcmd jointest <Specialize>
+    #参加指定专业“Specialize”的考试
+- 文件：
+
+
+```
+#### data\srh.shirakana.hoshinoyumemi.plugin\HoshinoYumemiCourse
+
+# 题目
+Course: 
+数学:
+  - 1+1=?: 2
+  - 题目: 答案
+专业:
+  - 题目: 答案
+
+还有两个json，存储用户和工作（）
+```
