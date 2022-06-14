@@ -75,7 +75,7 @@ public object ShirakanaEventListener : SimpleListenerHost() {
                     HoshinoYumemiMoney.HoshinoYumemiNoMoney[member.id] = 0.0
                 }
                 if(userS[member.id]==null){
-                    userS.userdata.add(UserWorks.UserWorksData(member.id,0,"null",false,"",false))
+                    userS.userdata.add(UserWorks.UserWorksData(member.id,0,"null",false,"",false,""))
                 }
             }
         }
@@ -266,6 +266,24 @@ public object ShirakanaEventListener : SimpleListenerHost() {
                 group.sendMessage("哼，不理你了")
                 return
             }
+            if(userS[sender.id]!!.testState){
+                if(message.contentToString().replace(At(bot).contentToString()+"  ","").replace(At(bot).contentToString()+" ","").replace(At(bot).contentToString(),"")==HoshinoYumemiCourse.HoshinoYumemiNoCourses[userS[sender.id]!!.testSpecialize]!!.find{it.keys.contains(userS[sender.id]!!.testQuest)}!![userS[sender.id]!!.testQuest]){
+                    if(userS[sender.id]!!.specialized==userS[sender.id]!!.testSpecialize) {
+                        if (userS[sender.id]!!.degree < 20) {
+                            userS[sender.id]!!.degree++
+                            subject.sendMessage("恭喜你，答对了，等级增加")
+                        }
+                    }else{
+                        subject.sendMessage("恭喜你，答对了")
+                    }
+                }else{
+                    subject.sendMessage(message.contentToString().replace(At(bot).contentToString(),"")+"不是正确的答案或格式错误，很遗憾，答错了")
+                }
+                userS[sender.id]!!.testState=false
+                userS[sender.id]!!.testQuest=""
+                userS[sender.id]!!.testSpecialize=""
+                return
+            }
             if(message.contentToString().replace(At(bot).contentToString(),"").replace(" ","")=="好感"||message.contentToString().contains("查看好感")||message.contentToString().contains("我的好感")){
                 val msgChain = buildMessageChain {
                     +At(sender)
@@ -284,19 +302,6 @@ public object ShirakanaEventListener : SimpleListenerHost() {
             }
             if(message.contentToString().replace(At(bot).contentToString(),"").replace(" ","")=="打工"){
                 userS[sender.id]?.work()?.let { group.sendMessage(it) }
-                return
-            }
-            if(userS[sender.id]!!.testState){
-                if(message.contentToString().replace(At(bot).contentToString()+"  ","").replace(At(bot).contentToString()+" ","").replace(At(bot).contentToString(),"")==HoshinoYumemiCourse.HoshinoYumemiNoCourses[userS[sender.id]!!.specialized]!!.find{it.keys.contains(userS[sender.id]!!.testQuest)}!![userS[sender.id]!!.testQuest]){
-                    subject.sendMessage("恭喜你，答对了")
-                    if(userS[sender.id]!!.degree<20){
-                        userS[sender.id]!!.degree++
-                    }
-                }else{
-                    subject.sendMessage(message.contentToString().replace(At(bot).contentToString(),"")+"不是正确的答案或格式错误，很遗憾，答错了")
-                }
-                userS[sender.id]!!.testState=false
-                userS[sender.id]!!.testQuest=""
                 return
             }
             for(key in HoshinoYumemiReplyList.HoshinoYumemiNoReplyList.keys){

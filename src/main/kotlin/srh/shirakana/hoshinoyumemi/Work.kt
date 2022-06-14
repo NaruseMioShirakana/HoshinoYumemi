@@ -19,7 +19,8 @@ data class UserWorks(val userdata : MutableList<UserWorksData> = mutableListOf<U
         var specialized: String,
         var state: Boolean,
         var testQuest: String,
-        var testState: Boolean
+        var testState: Boolean,
+        var testSpecialize:String
     ){
         public fun work():MessageChain{
             if(this.state){

@@ -606,10 +606,17 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
         if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]==null){
             HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]= mutableSetOf()
         }
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]!!.find{it.keys.contains(Question)}!=null){
+            sendMessage("该题目已经存在")
+            return
+        }
         if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]!!.add(mapOf(Question to Answer))){
             sendMessage("添加成功")
         }else{
             sendMessage("添加失败")
+        }
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]!!.isEmpty()){
+            HoshinoYumemiCourse.HoshinoYumemiNoCourses.remove(Specialize)
         }
     }
     @OptIn(ExperimentalSerializationApi::class)
@@ -626,6 +633,9 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
             sendMessage("删除成功")
         }else{
             sendMessage("删除失败")
+        }
+        if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]!!.isEmpty()){
+            HoshinoYumemiCourse.HoshinoYumemiNoCourses.remove(Specialize)
         }
     }
 }
@@ -729,26 +739,52 @@ object HoshinoYumemiUserCommand : CompositeCommand(
         if(HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.contains(user!!.id)){
             return
         }
+        if(userS[user!!.id]?.testState==true){
+            sendMessage("请勿重复参加考试")
+            return
+        }
         if(!HoshinoYumemiCourse.HoshinoYumemiNoCourses.keys.contains(name)){
             sendMessage("没有指定的专业")
             return
         }
         if(userS[user!!.id]?.specialized!="null"&&userS[user!!.id]?.specialized!=name){
-            sendMessage("你只能参加你所在专业的考试")
-            return
+            sendMessage("若参加其他专业考试，不会增长您的等级")
         }
+        userS[user!!.id]?.testSpecialize=name
         if(userS[user!!.id]?.specialized=="null"){
             userS[user!!.id]?.specialized=name
         }
         if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[name]!!.isEmpty())return
-        val testQuestIndex = HoshinoYumemiCourse.HoshinoYumemiNoCourses[userS[user!!.id]!!.specialized]!!.size-1
+        val testQuestIndex = HoshinoYumemiCourse.HoshinoYumemiNoCourses[name]!!.size-1
         userS[user!!.id]?.testQuest=
-            HoshinoYumemiCourse.HoshinoYumemiNoCourses[userS[user!!.id]!!.specialized]!!.elementAt((0..testQuestIndex).random()).keys.elementAt(0)
+            HoshinoYumemiCourse.HoshinoYumemiNoCourses[name]!!.elementAt((0..testQuestIndex).random()).keys.elementAt(0)
         userS[user!!.id]?.testState=true
         sendMessage(buildMessageChain {
             +At(user!!)
-            +PlainText("题目：${ userS[user!!.id]?.testQuest!! }\n请回答（需要ATBOT并输入答案）")
+            +PlainText("题库中共有${testQuestIndex+1}道题\n题目：\n${ userS[user!!.id]?.testQuest!!.replace("<_>"," ").replace("<tab>","\t").replace("<enter>","\n") }\n请回答（需要ATBOT并输入答案）")
         })
+    }
+    @SubCommand
+    @Description("退出考试")
+    suspend fun CommandSender.exittest() {
+        if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
+            subject!!.sendMessage("哼，不理你了")
+            return
+        }
+        if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
+            return
+        }
+        if(HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.contains(user!!.id)){
+            return
+        }
+        if(user==null)return;
+        if(userS[user!!.id]?.testState==true){
+            userS[user!!.id]?.testState=false
+            userS[user!!.id]?.testSpecialize=""
+            userS[user!!.id]?.testQuest=""
+            sendMessage("退出成功")
+            return
+        }
     }
     @SubCommand
     @Description("列出目前存在的专业")
