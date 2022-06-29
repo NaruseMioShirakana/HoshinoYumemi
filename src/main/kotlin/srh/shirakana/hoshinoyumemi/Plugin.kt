@@ -15,7 +15,7 @@ object HoshiniYumemi : KotlinPlugin(
     JvmPluginDescription(
         id = "srh.shirakana.hoshinoyumemi.plugin",
         name = "功能性机器人",
-        version = "0.0.2",
+        version = "0.0.3",
     ) {
         author("藤原白叶")
     }
