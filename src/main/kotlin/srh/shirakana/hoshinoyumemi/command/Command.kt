@@ -718,7 +718,7 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
 }
 
 object HoshinoYumemiUserCommand : CompositeCommand(
-    HoshiniYumemi, "usrcmd","我",
+    HoshiniYumemi, "usrcmd","我的",
     description = "用户指令",
 ){
     @SubCommand("查看好感","kk")
