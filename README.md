@@ -42,9 +42,10 @@
 
     好感度指令：
     @机器人 好感（查看好感）
-    /usrcmd kk（查看好感）
+    /usrcmd(我的) kk(查看好感)（查看好感）
     /koukann <add/decrease> Member Amount（指定Member好感加减）
     /koukann <addall/decreaseall> Amount（所有群成员好感统一加减）
+    /好感度 添加/减少/全体添加/全体减少 分别对应以上指令
 - 2、好感度存储：
 
 
@@ -66,8 +67,9 @@ KouKannList:
 
     指令：
     @机器人 金币（查看金币）
-    /usrcmd mon（查看金币）
+    /usrcmd(我的) mon(查看金钱)（查看金币）
     /money <add/decrease> Member Amount（指定Member金币加减）
+    /金钱 添加/减少 分别对应以上指令
 - 2、金币存储
 
 ```
@@ -106,6 +108,7 @@ Money:
     /DataList <replyadd/replyadd> inputMsg KoukannLevel outputMsg其
     中inputMsg为输入的信息，KoukannLevel为好感度等级(好感度/100).toInt
     outputMsg为回复信息（该条回复会被写入上面提到的文件中）
+    /数据 添加回复/删除回复 分别对应以上指令
 
 - 2、回复列表存储：
 
@@ -197,23 +200,24 @@ ReplyList:
 - 指令：
 
 
-    /TCAPI MT InputString TargetLang 
+    /TCAPI(腾讯云) MT(机器翻译) InputString TargetLang 
     其中InputString为要翻译的字符串，空格用下划线"_"代替，TargetLang为
     目标语言，需要使用简写，如中文“zh”；日语“jp”；英语“en”
-    /eroImage g Tag Amount
+    /eroImage(涩图) g(发几张) Tag Amount
     获取Amount张（小于等于5）lolicon涩图，不支持R18，发送为转发消息模式
     30秒撤回，Tag可使用rand来代表随机Tag
-    /eroImage s Image
+    /eroImage(涩图) s(搜索) Image
     使用Saucenao搜索指定图片
 ----
 #### 六、礼物商店
 - 指令：
 
 
-    /usrcmd giftlist（列出礼物列表）
-    /usrcmd gift ID（给机器人送指定ID的礼物）
+    /usrcmd(我的) giftlist（列出礼物列表）
+    /usrcmd(我的) gift ID（给机器人送指定ID的礼物）
     /DataList <shopadd/shopdel> Name Cost（加减名为Name售价Cost的商品）
-    
+    /我的 礼物列表/送礼物
+    /数据 添加商品/删除商品
     机器人好感度获取为物品价格/1000
 - 文件：
 
@@ -240,13 +244,13 @@ Shop:
     打工功能，不过与其他娱乐机器人不同，想要打工，必须取得相应专业的学位
     而学位可以通过考试获得，考试的题目需机器人的管理者自行建库。
     指令：
-    /WorkAdm addTest <Specialize> <Question> <Answer>
+    /AdmCmd addTest <Specialize> <Question> <Answer>
     #为Specialize专业添加Question问题，答案为Answer（专业不存在则创建）
-    /WorkAdm addWork <requiredSpecialize> <reward>
+    /AdmCmd addWork <requiredSpecialize> <reward>
     #添加requiredSpecialize专业对应的工作，基础工资为reward（需要存在
     专业“requiredSpecialize”（上一个指令创建）
-    /WorkAdm delTest <Specialize> <Question>
-    /WorkAdm delWork <requiredSpecialize>
+    /AdmCmd delTest <Specialize> <Question>
+    /AdmCmd delWork <requiredSpecialize>
     #下面两个为删除相应内容
     /usrcmd LS 
     #查看所有存在的专业
@@ -256,6 +260,9 @@ Shop:
     #放弃自己的学位
     /usrcmd jointest <Specialize>
     #参加指定专业“Specialize”的考试
+    /usrcmd exittest
+    #退出当前考试
+    /我的 参加考试/退出考试/有什么专业/我的专业/放弃学位
 - 文件：
 
 
@@ -272,3 +279,18 @@ Course:
 
 还有两个json，存储用户和工作（）
 ```
+
+
+#### 更新日志：
+##### 6月10日-
+    1、名称显示修复
+    2、降低了聊天获取的好感度
+    3、降低了签到获取的金币
+    4、打工、学位系统实装并进入测试
+##### 6月14日-
+    1、标准化了试题的格式
+    2、修复了考试的几个BUG
+##### 6月29日-
+    1、添加了中文指令
+    2、腾讯云NLP聊天机器人开关（使用/AdmCmd Disable add/del 群号)
+    群号为0时则操作机器人所在的所有群

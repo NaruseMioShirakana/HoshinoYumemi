@@ -17,6 +17,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
@@ -40,7 +41,7 @@ import java.util.*
 import javax.imageio.ImageIO
 
 object HoshinoYumemiKouKannCommand : CompositeCommand(
-    HoshiniYumemi, "KouKann",
+    HoshiniYumemi, "KouKann","好感度",
     description = "操作好感度",
 ){
 
@@ -107,7 +108,8 @@ object HoshinoYumemiKouKannCommand : CompositeCommand(
         return outPutImage.toExternalResource()
     }
 
-    @SubCommand
+    @OptIn(ConsoleExperimentalApi::class)
+    @SubCommand("add","添加")
     @Description("增加好感度")
     suspend fun CommandSender.add(member : Member, Amount : Long) {
         if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[member.id]!=null){
@@ -130,7 +132,7 @@ object HoshinoYumemiKouKannCommand : CompositeCommand(
             sendMessage("用户不存在")
         }
     }
-    @SubCommand
+    @SubCommand("decrease","减少")
     @Description("减少好感度")
     suspend fun CommandSender.decrease(member : Member, Amount : Long) {
         if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[member.id]!=null){
@@ -140,20 +142,20 @@ object HoshinoYumemiKouKannCommand : CompositeCommand(
             sendMessage("用户不存在")
         }
     }
-    @SubCommand
+    @SubCommand("bladd","加入黑名单")
     @Description("添加黑名单")
     suspend fun CommandSender.bladd(Target : Long) {
         HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.add(Target)
         HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[Target] = -800.0
     }
     //
-    @SubCommand
+    @SubCommand("blrem","移除黑名单")
     @Description("移出黑名单")
     suspend fun CommandSender.blrem(Target : Long) {
         HoshinoYumemiBlackList.HoshinoYumemiNoBlackList.remove(Target)
     }
-    @SubCommand
-    @Description("增加好感度")
+    @SubCommand("addall","全体添加")
+    @Description("给全体增加好感度")
     suspend fun CommandSender.addall(Amount : Long) {
         val memberSet = subject?.id?.let { bot?.getGroup(it)?.members } ?: return
         for(member in memberSet) {
@@ -177,8 +179,8 @@ object HoshinoYumemiKouKannCommand : CompositeCommand(
         }
         sendMessage("完成")
     }
-    @SubCommand
-    @Description("减少好感度")
+    @SubCommand("decreaseall","全体减少")
+    @Description("给全体减少好感度")
     suspend fun CommandSender.decreaseall(Amount : Long) {
         val memberSet = subject?.id?.let { bot?.getGroup(it)?.members } ?: return
         for(member in memberSet) {
@@ -193,10 +195,10 @@ object HoshinoYumemiKouKannCommand : CompositeCommand(
 }
 
 object HoshinoYumemiMoneyCommand : CompositeCommand(
-    HoshiniYumemi, "Money",
+    HoshiniYumemi, "Money","金钱",
     description = "操作金钱",
 ){
-    @SubCommand
+    @SubCommand("add","添加")
     @Description("增加金钱")
     suspend fun CommandSender.add(member : Member, Amount : Long) {
         if(HoshinoYumemiMoney.HoshinoYumemiNoMoney[member.id]!=null){
@@ -206,7 +208,7 @@ object HoshinoYumemiMoneyCommand : CompositeCommand(
             sendMessage("用户不存在")
         }
     }
-    @SubCommand
+    @SubCommand("decrease","减少")
     @Description("减少金钱")
     suspend fun CommandSender.decrease(member : Member, Amount : Long) {
         if(HoshinoYumemiMoney.HoshinoYumemiNoMoney[member.id]!=null){
@@ -219,10 +221,10 @@ object HoshinoYumemiMoneyCommand : CompositeCommand(
 }
 
 object HoshinoYumemiReplyListCommand : CompositeCommand(
-    HoshiniYumemi, "DataList",
+    HoshiniYumemi, "DataList","数据",
     description = "操作回复列表与商店列表",
 ){
-    @SubCommand
+    @SubCommand("replyadd","添加回复")
     @Description("增加回复")
     suspend fun CommandSender.replyadd(input : String, KouKannLevel : Long, output : String) {
         if(KouKannLevel>10){
@@ -236,7 +238,7 @@ object HoshinoYumemiReplyListCommand : CompositeCommand(
             sendMessage("添加成功")
         }
     }
-    @SubCommand
+    @SubCommand("replydel","删除回复")
     @Description("删除指定回复")
     suspend fun CommandSender.replydel(input : String, KouKannLevel : Long, output : String) {
         if(HoshinoYumemiReplyList.HoshinoYumemiNoReplyList[input]==null|| HoshinoYumemiReplyList.HoshinoYumemiNoReplyList[input]?.contains(mapOf(KouKannLevel to output)) == false){
@@ -248,13 +250,13 @@ object HoshinoYumemiReplyListCommand : CompositeCommand(
         }
         sendMessage("删除成功")
     }
-    @SubCommand
+    @SubCommand("shopadd","添加商品")
     @Description("添加商品")
     suspend fun CommandSender.shopadd(name : String, cost : Double) {
         HoshinoYumemiShop.HoshinoYumemiNoShop.add(mutableMapOf(name to cost))
         sendMessage("商品添加成功")
     }
-    @SubCommand
+    @SubCommand("shopdel","删除商品")
     @Description("删除商品")
     suspend fun CommandSender.shopdel(name : String, cost : Double) {
         HoshinoYumemiShop.HoshinoYumemiNoShop.remove(mutableMapOf(name to cost))
@@ -263,10 +265,10 @@ object HoshinoYumemiReplyListCommand : CompositeCommand(
 }
 
 object HoshinoYumemiTencentCloudAPI : CompositeCommand(
-    HoshiniYumemi, "TCAPI",
+    HoshiniYumemi, "TCAPI","腾讯云",
     description = "腾讯云API",
 ){
-    @SubCommand
+    @SubCommand("机器翻译","mt")
     @Description("机器翻译(input：输入的语句，lang：目标语言：zh（简体中文）：en（英语）、ja（日语）、ko（韩语）、fr（法语）、es（西班牙语）、it（意大利语）、de（德语）、tr（土耳其语）、ru（俄语）、pt（葡萄牙语）、vi（越南语）、id（印尼语）、th（泰语）、ms（马来语）)")
     suspend fun CommandSender.MT(input : String ,lang : String) {
         if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
@@ -378,7 +380,7 @@ object HoshinoYumemiTencentCloudAPI : CompositeCommand(
 }
 
 object HoshinoYumemiSeTuCommand : CompositeCommand(
-    HoshiniYumemi, "eroImage",
+    HoshiniYumemi, "eroImage","涩图","色图",
     description = "涩图",
 ){
 
@@ -418,7 +420,7 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    @SubCommand
+    @SubCommand("s","搜索")
     @Description("搜图")
     suspend fun CommandSender.s(image : Image) {
         if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
@@ -481,7 +483,7 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
         }
     }
     @OptIn(ExperimentalSerializationApi::class)
-    @SubCommand
+    @SubCommand("g","发几张")
     @Description("获取涩图")
     suspend fun CommandSender.g(tag : String,amount : Long) {
         if(subject==null||user==null){
@@ -551,12 +553,87 @@ object HoshinoYumemiSeTuCommand : CompositeCommand(
 }
 
 object HoshinoYumemiWorkCommand : CompositeCommand(
-    HoshiniYumemi, "WorkAdm",
-    description = "工作管理员指令",
+    HoshiniYumemi, "AdmCmd","上帝指令",
+    description = "管理员指令",
 ){
-
+    @SubCommand("Daixuexi","带学习")
+    @Description("带学习提醒")
+    suspend fun CommandSender.Daixuexi(Mode : String ,GroupId : Long) {
+        if(bot==null){
+            return
+        }
+        if(Mode=="add"){
+            if(GroupId==0L){
+                for(group in bot!!.groups){
+                    HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.add(group.id)
+                    sendMessage("已在全部群中启用")
+                }
+            }else{
+                if(bot!!.getGroup(GroupId)!=null){
+                    if(HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.add(GroupId)){
+                        sendMessage("添加成功")
+                    }else{
+                        sendMessage("添加失败")
+                    }
+                }
+            }
+            return
+        }
+        if(Mode=="del"){
+            if(GroupId==0L){
+                HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.clear()
+                sendMessage("已在所有群中禁用")
+            }else{
+                if(HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.remove(GroupId)){
+                    sendMessage("删除成功")
+                }else{
+                    sendMessage("删除失败")
+                }
+            }
+            return
+        }
+        sendMessage("参数错误")
+    }
+    @SubCommand("Disable","NLP")
+    @Description("禁用NLP的群聊")
+    suspend fun CommandSender.Disable(Mode : String ,GroupId : Long) {
+        if(bot==null){
+            return
+        }
+        if(Mode=="add"){
+            if(GroupId==0L){
+                for(group in bot!!.groups){
+                    HoshinoYumemiTencentCloudDisabledGroups.HoshinoYumemiNoTencentCloudDisabledGroups.add(group.id)
+                    sendMessage("已在全部群中禁用")
+                }
+            }else{
+                if(bot!!.getGroup(GroupId)!=null){
+                    if(HoshinoYumemiTencentCloudDisabledGroups.HoshinoYumemiNoTencentCloudDisabledGroups.add(GroupId)){
+                        sendMessage("添加成功")
+                    }else{
+                        sendMessage("添加失败")
+                    }
+                }
+            }
+            return
+        }
+        if(Mode=="del"){
+            if(GroupId==0L){
+                HoshinoYumemiTencentCloudDisabledGroups.HoshinoYumemiNoTencentCloudDisabledGroups.clear()
+                sendMessage("已在所有群中启用")
+            }else{
+                if(HoshinoYumemiTencentCloudDisabledGroups.HoshinoYumemiNoTencentCloudDisabledGroups.remove(GroupId)){
+                    sendMessage("删除成功")
+                }else{
+                    sendMessage("删除失败")
+                }
+            }
+            return
+        }
+        sendMessage("参数错误")
+    }
     @OptIn(ExperimentalSerializationApi::class)
-    @SubCommand
+    @SubCommand("添加工作","addWork")
     @Description("添加工作")
     suspend fun CommandSender.addWork(requiredSpecialize : String,reward : Double) {
         if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[requiredSpecialize]==null){
@@ -582,7 +659,7 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
         }
     }
     @OptIn(ExperimentalSerializationApi::class)
-    @SubCommand
+    @SubCommand("删除工作","delWork")
     @Description("删除工作")
     suspend fun CommandSender.delWork(requiredSpecialize : String) {
         if(userJobs.job.remove(userJobs.job.find{it.requiredSpecialized == requiredSpecialize})){
@@ -600,7 +677,7 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
         }
     }
     @OptIn(ExperimentalSerializationApi::class)
-    @SubCommand
+    @SubCommand("添加考试题目","addTest")
     @Description("添加考试题目")
     suspend fun CommandSender.addTest(Specialize : String,Question : String,Answer : String) {
         if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]==null){
@@ -620,7 +697,7 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
         }
     }
     @OptIn(ExperimentalSerializationApi::class)
-    @SubCommand
+    @SubCommand("删除考试题目","delTest")
     @Description("删除考试题目")
     suspend fun CommandSender.delTest(Specialize : String,Question : String) {
         if(HoshinoYumemiCourse.HoshinoYumemiNoCourses[Specialize]==null){
@@ -641,10 +718,10 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
 }
 
 object HoshinoYumemiUserCommand : CompositeCommand(
-    HoshiniYumemi, "usrcmd",
+    HoshiniYumemi, "usrcmd","我",
     description = "用户指令",
 ){
-    @SubCommand
+    @SubCommand("查看好感","kk")
     @Description("查看好感")
     suspend fun CommandSender.kk() {
         if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
@@ -657,7 +734,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
         }
         sendMessage(msgChain)
     }
-    @SubCommand
+    @SubCommand("查看金钱","mon")
     @Description("查看金钱")
     suspend fun CommandSender.mon() {
         if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
@@ -670,7 +747,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
         }
         sendMessage(msgChain)
     }
-    @SubCommand
+    @SubCommand("查看礼物","giftlist")
     @Description("查看存在的礼物")
     suspend fun CommandSender.giftlist() {
         if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
@@ -690,7 +767,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
         }
         sendMessage(msg)
     }
-    @SubCommand
+    @SubCommand("送礼物","gift")
     @Description("给BOT送礼物")
     suspend fun CommandSender.gift(ID : Long) {
         if(!HoshinoYumemiSwitch.HoshinoYumemiNoSwitch){
@@ -725,7 +802,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
             sendMessage("不存在该ID")
         }
     }
-    @SubCommand
+    @SubCommand("参加考试","jointest")
     @Description("参加指定专业的考试")
     suspend fun CommandSender.jointest(name : String) {
         if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
@@ -764,7 +841,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
             +PlainText("题库中共有${testQuestIndex+1}道题\n题目：\n${ userS[user!!.id]?.testQuest!!.replace("<_>"," ").replace("<tab>","\t").replace("<enter>","\n") }\n请回答（需要ATBOT并输入答案）")
         })
     }
-    @SubCommand
+    @SubCommand("退出考试","exittest")
     @Description("退出考试")
     suspend fun CommandSender.exittest() {
         if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
@@ -786,7 +863,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
             return
         }
     }
-    @SubCommand
+    @SubCommand("有什么专业","LS")
     @Description("列出目前存在的专业")
     suspend fun CommandSender.LS() {
         if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
@@ -802,7 +879,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
         }
         sendMessage("目前有的专业：${HoshinoYumemiCourse.HoshinoYumemiNoCourses.keys.toString()}")
     }
-    @SubCommand
+    @SubCommand("我的专业","mysp")
     @Description("显示自己的专业及学位")
     suspend fun CommandSender.mysp() {
         if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){
@@ -818,7 +895,7 @@ object HoshinoYumemiUserCommand : CompositeCommand(
         }
         sendMessage("目前有的专业：${userS[user!!.id]!!.specialized}\n目前的学位：${userS[user!!.id]!!.degree}")
     }
-    @SubCommand
+    @SubCommand("放弃学位","giveupmysp")
     @Description("放弃当前学位")
     suspend fun CommandSender.giveupmysp() {
         if(HoshinoYumemiKouKann.HoshinoYumemiNoKouKann[user!!.id]!! <0){

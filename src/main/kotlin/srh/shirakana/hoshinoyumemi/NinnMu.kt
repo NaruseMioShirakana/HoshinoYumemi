@@ -121,6 +121,7 @@ public object ShirakanaEventListener : SimpleListenerHost() {
         }, startTime, 1000*24*60*60)
         println("开启定时任务：好感度及每日状态重载")
     }
+
     @EventHandler
     @OptIn(ExperimentalSerializationApi::class)
     internal suspend fun BotOfflineEvent.handle0() {
@@ -326,33 +327,42 @@ public object ShirakanaEventListener : SimpleListenerHost() {
                     return
                 }
             }
-            try {
-                val cred = Credential(HoshinoYumemiTencentCloudApiConfig.HoshinoYumemiSecretId, HoshinoYumemiTencentCloudApiConfig.HoshinoYumemiSecretKey)
-                val httpProfile = HttpProfile()
-                httpProfile.endpoint = "nlp.tencentcloudapi.com"
-                val clientProfile = ClientProfile()
-                clientProfile.httpProfile = httpProfile
-                val client = NlpClient(cred, "ap-guangzhou", clientProfile)
-                val req = ChatBotRequest()
-                req.flag = 0L
-                val msgInput = message.contentToString().replace(At(bot).contentToString(),"")
-                req.query = msgInput
-                val resp = client.ChatBot(req)
-                if(resp.reply.contains("喜欢")){
+            if(!HoshinoYumemiTencentCloudDisabledGroups.HoshinoYumemiNoTencentCloudDisabledGroups.contains(subject.id)) {
+                try {
+                    val cred = Credential(
+                        HoshinoYumemiTencentCloudApiConfig.HoshinoYumemiSecretId,
+                        HoshinoYumemiTencentCloudApiConfig.HoshinoYumemiSecretKey
+                    )
+                    val httpProfile = HttpProfile()
+                    httpProfile.endpoint = "nlp.tencentcloudapi.com"
+                    val clientProfile = ClientProfile()
+                    clientProfile.httpProfile = httpProfile
+                    val client = NlpClient(cred, "ap-guangzhou", clientProfile)
+                    val req = ChatBotRequest()
+                    req.flag = 0L
+                    val msgInput = message.contentToString().replace(At(bot).contentToString(), "")
+                    req.query = msgInput
+                    val resp = client.ChatBot(req)
+                    if (resp.reply.contains("喜欢")) {
+                        val msgChain = buildMessageChain {
+                            +At(sender)
+                            +PlainText(" ...")
+                        }
+                        group.sendMessage(msgChain)
+                        return
+                    }
                     val msgChain = buildMessageChain {
                         +At(sender)
-                        +PlainText(" ...")
+                        +PlainText(
+                            " " + resp.reply.replace("腾讯小龙女", HoshinoYumemiConfig.HoshinoYumemiNoName)
+                                .replace("小龙女", HoshinoYumemiConfig.HoshinoYumemiNoName)
+                                .replace("姑姑", HoshinoYumemiConfig.HoshinoYumemiNoName)
+                        )
                     }
                     group.sendMessage(msgChain)
-                    return
+                } catch (e: TencentCloudSDKException) {
+                    group.sendMessage(e.toString())
                 }
-                val msgChain = buildMessageChain {
-                    +At(sender)
-                    +PlainText(" "+resp.reply.replace("腾讯小龙女",HoshinoYumemiConfig.HoshinoYumemiNoName).replace("小龙女",HoshinoYumemiConfig.HoshinoYumemiNoName).replace("姑姑",HoshinoYumemiConfig.HoshinoYumemiNoName))
-                }
-                group.sendMessage(msgChain)
-            } catch (e: TencentCloudSDKException) {
-                group.sendMessage(e.toString())
             }
         }
     }
