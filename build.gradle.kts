@@ -15,6 +15,6 @@ repositories {
 }
 dependencies {
     implementation("com.tencentcloudapi:tencentcloud-sdk-java:4.0.11")
-    implementation("com.alibaba:fastjson:2.0.3")
+    implementation("com.alibaba:fastjson:2.0.7")
     implementation("org.xerial:sqlite-jdbc:3.36.0.3")
 }
