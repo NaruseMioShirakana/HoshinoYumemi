@@ -556,44 +556,6 @@ object HoshinoYumemiWorkCommand : CompositeCommand(
     HoshiniYumemi, "AdmCmd","上帝指令",
     description = "管理员指令",
 ){
-    @SubCommand("Daixuexi","带学习")
-    @Description("带学习提醒")
-    suspend fun CommandSender.Daixuexi(Mode : String ,GroupId : Long) {
-        if(bot==null){
-            return
-        }
-        if(Mode=="add"){
-            if(GroupId==0L){
-                for(group in bot!!.groups){
-                    HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.add(group.id)
-                    sendMessage("已在全部群中启用")
-                }
-            }else{
-                if(bot!!.getGroup(GroupId)!=null){
-                    if(HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.add(GroupId)){
-                        sendMessage("添加成功")
-                    }else{
-                        sendMessage("添加失败")
-                    }
-                }
-            }
-            return
-        }
-        if(Mode=="del"){
-            if(GroupId==0L){
-                HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.clear()
-                sendMessage("已在所有群中禁用")
-            }else{
-                if(HoshinoYumemiDaiXueXi.HoshinoYumemiNoDaiXueXi.remove(GroupId)){
-                    sendMessage("删除成功")
-                }else{
-                    sendMessage("删除失败")
-                }
-            }
-            return
-        }
-        sendMessage("参数错误")
-    }
     @SubCommand("Disable","NLP")
     @Description("禁用NLP的群聊")
     suspend fun CommandSender.Disable(Mode : String ,GroupId : Long) {

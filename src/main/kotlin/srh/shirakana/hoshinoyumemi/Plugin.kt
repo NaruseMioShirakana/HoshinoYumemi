@@ -21,7 +21,7 @@ object HoshiniYumemi : KotlinPlugin(
     }
 ) {
     override fun onEnable() {
-
+        HoshinoYumemiTencentCloudDisabledGroups.reload()
         HoshinoYumemiTencentCloudApiConfig.reload()
         HoshinoYumemiReplyList.reload()
         HoshinoYumemiKouKann.reload()
